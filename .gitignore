@@ -1,0 +1,9 @@
+# Compiled source #
+###################
+*.exe
+*.o
+*.so
+*.elf
+*.hex
+
+*.bak
