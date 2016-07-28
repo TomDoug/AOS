@@ -15,43 +15,43 @@ will be parsed by the kernel.
 The serial module handle all of the USART processing. This module is respnsable for setting up
 the USART, attaching it to stdin and stdout, and parsing the commands.
 
-typedef int (*cmd_func) (int argc, char* argv[], void *ctx);
+	typedef int (*cmd_func) (int argc, char* argv[], void *ctx);
 
-void* add_command(char* command, cmd_func run, void* ctx, char* help);
-	Add a command to the command parser
-	inputs:
-		char* command - Name of the command to match against ("help")
-		cmd_func run - Callback to be run when this command is matched
-		void* ctx - Optional context that can be passed into the run callback
-		char* help - A small one line description to be placed in the output of the "help" command
+	void* add_command(char* command, cmd_func run, void* ctx, char* help);
+		Add a command to the command parser
+		inputs:
+			char* command - Name of the command to match against ("help")
+			cmd_func run - Callback to be run when this command is matched
+			void* ctx - Optional context that can be passed into the run callback
+			char* help - A small one line description to be placed in the output of the "help" command
 
-	returns:
-		void* - Handle reserved for future use (removing commands)
+		returns:
+			void* - Handle reserved for future use (removing commands)
 
-int serial_startup (void);
-	Startup the USART and attach the stdio. This should only need to be called from within the kernel.
-	
-	inputs:
-		void
-	returns:
-		int - always 0
+	int serial_startup (void);
+		Startup the USART and attach the stdio. This should only need to be called from within the kernel.
 
-void serial_poll (void);
-	Poll the serial module. This should only be called by the kernel.
+		inputs:
+			void
+		returns:
+			int - always 0
 
-	inputs:
-		void
-	returns:
-		void
+	void serial_poll (void);
+		Poll the serial module. This should only be called by the kernel.
 
-char kbhit (void);
-	Check to see if a character has beed pressed. (Note: user space input handling will likely 
-	interfere with command processing).
-	
-	input:
-		void
-	returns: 
-		char - 1 if an unhandled key has been pressed. 0 otherwise.
+		inputs:
+			void
+		returns:
+			void
+
+	char kbhit (void);
+		Check to see if a character has beed pressed. (Note: user space input handling will likely 
+		interfere with command processing).
+
+		input:
+			void
+		returns: 
+			char - 1 if an unhandled key has been pressed. 0 otherwise.
 
 	
 
