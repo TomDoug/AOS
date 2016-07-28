@@ -44,15 +44,16 @@ the USART, attaching it to stdin and stdout, and parsing the commands.
 		returns:
 			void
 
-	char kbhit (void);
-		Check to see if a character has beed pressed. (Note: user space input handling will likely 
-		interfere with command processing).
+'''
+char kbhit (void);
+	Check to see if a character has beed pressed. (Note: user space input handling will likely 
+	interfere with command processing).
 
-		input:
-			void
-		returns: 
-			char - 1 if an unhandled key has been pressed. 0 otherwise.
-
+	input:
+		void
+	returns: 
+		char - 1 if an unhandled key has been pressed. 0 otherwise.
+'''
 	
 
 #Feature Roadmap/TODO
