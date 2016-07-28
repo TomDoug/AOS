@@ -5,6 +5,7 @@
 #include <avr/interrupt.h>
 
 #include "kernel.h"
+#include "kernel_local.h"
 #include "serial.h"
 
 #define MS_PER_TIMER 10L

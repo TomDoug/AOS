@@ -11,6 +11,65 @@ access to the ADC's of the chip (currently only ADC0).
 AOS provides a command interface. Commands can be entered into the serial console from a PC and
 will be parsed by the kernel.
 
+#Kernel API
+The kernel module implements the tasks and the timer functionality
+
+```
+typedef int (*startup_func) (void *ctx);
+typedef int (*shutdown_func) (void *ctx);
+typedef int (*run_func) (void *ctx);
+```
+
+```
+extern unsigned int timer_ticks;
+	Timer counter that invciments once evert 10ms (TODO: Check if this statement is accurate)
+```
+
+```
+int kernel_main (void);
+	The main entry point into the kernel. This is also home to the main processing loop.	
+
+	inputs:
+		void
+	returns:
+		int - 0 but this function never actually returns
+```
+
+```
+void* add_task (startup_func start, shutdown_func stop, run_func run, void *ctx);
+	Add a task to the kernel.
+	
+	inputs:
+		startup_func start - callback to be run once when this task is started.
+		shutdown_func stop - callback to be called once when this function is shutdown.
+		run_func run - callback to be called as often as possible.
+		void *ctx - a context to pass into all of the callbacks.
+
+	returns:
+		void* - handle to the task that was created.
+```
+
+```
+int stop_task (void *task_handle);
+	stop a task and remove it from the running tasks.
+
+	inputs:
+		void* - handle to the task to be removed.
+
+	returns:
+		int - 0 on sucess. -1 if task is not in running list.
+```
+
+```
+void adc_startup (void);
+	startup the adc. This should really be something that only the kernel calls.
+	inputs:
+		void
+	return:
+		void
+```
+
+
 #Serial API
 The serial module handle all of the USART processing. This module is respnsable for setting up
 the USART, attaching it to stdin and stdout, and parsing the commands.

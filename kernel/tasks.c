@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include "kernel\kernel.h"
+#include "kernel\kernel_local.h"
 
 /* Pool to take our tasks from */
 task_t task_pool[TOTAL_TASKS];
@@ -73,7 +74,7 @@ task_spin (void)
 	return ret;
 }
 
-task_t*
+void*
 add_task (startup_func start, shutdown_func stop, run_func run, void *ctx)
 {
 	int i;
@@ -123,10 +124,11 @@ add_task (startup_func start, shutdown_func stop, run_func run, void *ctx)
 }
 
 int
-stop_task(task_t* task_handle)
+stop_task(void* handle)
 {
 	int exists = 0;
 	int i = 0;
+	task_t *task_handle = (task_t*)handle;
 
 	//TODO: check that the task exists and that it is allocates
 	for (i = 0; i < TOTAL_TASKS; i++) {
