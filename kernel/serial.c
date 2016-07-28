@@ -8,7 +8,8 @@
 #define COMMAND_BUFFER_SIZE 64
 #include <util/setbaud.h>
 
-#undef DEBUG_COMMAND_PARSE
+#define DEBUG_COMMAND_PARSE
+#define NUM_COMMANDS 24
 
 /* These are the streams that will be used for stdin and stdout */
 //FILE uart_output;
@@ -17,14 +18,55 @@
 char command_buffer[COMMAND_BUFFER_SIZE];
 uint8_t command_buffer_pointer = 0;
 
+command_t commands[NUM_COMMANDS];
+
+#if 0
 command_t commands[] = {
 	{"help", print_help},
 	{NULL, NULL}
 };
+#endif
 
+//note: save this pointer. as of now the only way to diable a command
+//form being run is to null its run function
+command_t*
+add_command(char* command, cmd_func run, void* ctx) {
+	int i = 0;
+
+	/* Command 0 is always help */
+	for (i = 1; i < NUM_COMMANDS; i++) {
+		if (commands[i].command == NULL) {
+			commands[i].command = command;
+			commands[i].run = run;
+			commands[i].ctx = ctx;
+#ifdef DEBUG_COMMAND_PARSE
+			printf("Command %s added\n", command);
+#endif /* DEBUG_COMMAND_PARSE */
+			return;
+		}
+	}
+	printf("Could not add command, all spots full\n");
+}
+
+void
+init_commands (void)
+{
+	int i = 0;
+
+	//startup the help command
+	commands[i].command = "help";
+	commands[i].run = print_help;
+	commands[i].ctx == NULL;
+
+	for (i = 1; i < NUM_COMMANDS; i++) {
+		commands[i].command == NULL;
+		commands[i].run == NULL;
+		commands[i].ctx == NULL;
+	}
+}
 
 int
-print_help (void)
+print_help (int argc, char* argv[], void *ctx)
 {
 	command_t *current_command;
 	char i = 0;
@@ -116,13 +158,15 @@ serial_find_command (void)
 
 	current_command = &commands[i];
 
+	printf("checking command %s\n", current_command->command);
+
 	while ((current_command->command) != NULL) {
 		if (serial_match_strings(current_command->command, command_buffer)) {
 #ifdef DEBUG_COMMAND_PARSE
 			printf("Found command %s\n", current_command->command);
 #endif /* DEBUG_COMMAND_PARSE */
 			if (current_command->run) {
-				current_command->run();
+				current_command->run(0,0,current_command->ctx);
 			}
 			break;
 		}
@@ -165,6 +209,9 @@ USART_init (void)
 	/* Enable RX, RX int, and TX */
 	UCSR0B = _BV(RXEN0) | _BV(TXEN0);
 	sei();
+
+	/* Startup the command parser */
+	init_commands();
 }
 
 void

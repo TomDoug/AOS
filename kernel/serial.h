@@ -1,18 +1,19 @@
 #include <stdio.h>
 
 typedef struct command_s command_t;
-typedef int (*cmd_func) (void);
+typedef int (*cmd_func) (int argc, char* argv[], void *ctx);
 
 typedef struct command_s {
-	const char		*command;
+	const char	*command;
 	cmd_func	run;
+	void		*ctx;
 };
 
 
 
-int print_help (void);
+int print_help (int argc, char* argv[], void *ctx);
 
-
+void add_command(char* command, cmd_func run, void* ctx);
 
 
 void USART_putchar (char c, FILE *stream);

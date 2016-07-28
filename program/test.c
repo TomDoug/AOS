@@ -23,6 +23,9 @@ typedef struct {
 
 adc_ctx adc;
 
+void led_on (int argc, char* argv[], void *ctx);
+void led_off (int argc, char* argv[], void *ctx);
+
 /***** BLINK TEST ******/
 int blink_startup (void *ctx)
 {
@@ -35,10 +38,31 @@ int blink_startup (void *ctx)
 	blnk->last_timer = timer_ticks;
 	//enable d5 as output
 	DDRD |= (1 << PD5);
+
+	//add commands to turn the LED on and off
+	add_command("ledon", led_on, ctx);
+	add_command("ledoff", led_off, ctx);
+}
+
+void led_on (int argc, char* argv[], void *ctx)
+{
+	blink_ctx *blnk = ctx;
+	//turn on led
+	PORTD |= (1 << PD5);
+	blnk->state = 1;
+}
+
+void led_off (int argc, char* argv[], void *ctx)
+{
+	blink_ctx *blnk = ctx;
+	//turn off the LED
+	PORTD &= ~(1 << PD5);
+	blnk->state = 0;
 }
 
 int blink_run (void *ctx)
 {
+#if 0 //adc test
 	blink_ctx *blnk = ctx;
 	unsigned int elapsed_time;
 	unsigned int current_time = timer_ticks;
@@ -65,7 +89,9 @@ int blink_run (void *ctx)
 			PORTD &= ~(1 << PD5);
 			blnk->state = 0;
 		}
-	}
+	}	
+#endif
+	return 0;
 }
 
 int adc_test_startup (void *ctx) {

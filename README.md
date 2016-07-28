@@ -10,3 +10,10 @@ access to the ADC's of the chip (currently only ADC0).
 
 AOS provides a command interface. Commands can be entered into the serial console from a PC and
 will be parsed by the kernel.
+
+#Feature Roadmap/TODO
+- Add shift register support for both outputs and muliplexed inputs
+- Add enc28j60 ethernet support
+- Make help print look nicer
+- Add ability to turn on/off options
+- Add more sample tasks
