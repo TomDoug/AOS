@@ -10,7 +10,7 @@ LIB=
 # The main sections of the kernel
 KERNAL_MAIN_SRC=kernel\kernel.c kernel\tasks.c
 # The kernel extras
-KERNEL_ALT_SRC=kernel\serial.c kernel\adc.c
+KERNEL_ALT_SRC=kernel\serial.c kernel\adc.c kernel\shift.c
 # All of ther kernel sources together
 KERNEL_SOURCES=$(KERNAL_MAIN_SRC) $(KERNEL_ALT_SRC)
 

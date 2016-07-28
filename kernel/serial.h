@@ -1,34 +1,13 @@
-#include <stdio.h>
+#ifndef _SERIAL_H
+#define _SERIAL_H
 
-typedef struct command_s command_t;
+#include <stdio.h>
 typedef int (*cmd_func) (int argc, char* argv[], void *ctx);
 
-typedef struct command_s {
-	const char	*command;
-	cmd_func	run;
-	void		*ctx;
-};
-
-
-
-int print_help (int argc, char* argv[], void *ctx);
-
-command_t* add_command(char* command, cmd_func run, void* ctx);
-
-
-void USART_putchar (char c, FILE *stream);
-char USART_getchar(FILE *stream);
-
+/* Serial API */
+void* add_command(char* command, cmd_func run, void* ctx, char* help);
 int serial_startup (void);
-
 void serial_poll (void);
-
-char USART_kbhit (void);
-
 char kbhit (void);
 
-
-
-
-//extern FILE uart_output;
-//extern FILE uart_input;
+#endif /* _SERIAL_H */

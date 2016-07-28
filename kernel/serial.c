@@ -2,14 +2,12 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
-#include "serial.h"
-
-#define BAUD 19200
-#define COMMAND_BUFFER_SIZE 64
+#include "kernel/kernel.h"
+#include "kernel/serial_local.h"
 #include <util/setbaud.h>
 
-#define DEBUG_COMMAND_PARSE
-#define NUM_COMMANDS 24
+
+#undef DEBUG_COMMAND_PARSE
 
 /* These are the streams that will be used for stdin and stdout */
 //FILE uart_output;
@@ -20,17 +18,10 @@ uint8_t command_buffer_pointer = 0;
 
 command_t commands[NUM_COMMANDS];
 
-#if 0
-command_t commands[] = {
-	{"help", print_help},
-	{NULL, NULL}
-};
-#endif
-
 //note: save this pointer. as of now the only way to diable a command
 //form being run is to null its run function
-command_t*
-add_command(char* command, cmd_func run, void* ctx) {
+void*
+add_command(char* command, cmd_func run, void* ctx, char *help) {
 	int i = 0;
 
 	/* Command 0 is always help */
@@ -39,6 +30,7 @@ add_command(char* command, cmd_func run, void* ctx) {
 			commands[i].command = command;
 			commands[i].run = run;
 			commands[i].ctx = ctx;
+			commands[i].help = help;
 #ifdef DEBUG_COMMAND_PARSE
 			printf("Command %s added\n", command);
 #endif /* DEBUG_COMMAND_PARSE */
@@ -57,12 +49,14 @@ init_commands (void)
 	//startup the help command
 	commands[i].command = "help";
 	commands[i].run = print_help;
-	commands[i].ctx == NULL;
+	commands[i].ctx = NULL;
+	commands[i].help = "Print all available commands";
 
 	for (i = 1; i < NUM_COMMANDS; i++) {
-		commands[i].command == NULL;
-		commands[i].run == NULL;
-		commands[i].ctx == NULL;
+		commands[i].command = NULL;
+		commands[i].run = NULL;
+		commands[i].ctx = NULL;
+		commands[i].help = NULL;
 	}
 }
 
@@ -75,7 +69,11 @@ print_help (int argc, char* argv[], void *ctx)
 	printf("Available commands: \n");
 
 	while (current_command->command != NULL) {
-		printf("\t%s\n", current_command->command);
+		printf("\t%s", current_command->command);
+		if (current_command->help != NULL) {
+			printf(" - %s", commands[i].help);
+		}
+		printf("\n");
 		current_command = &commands[++i];
 	}
 	
@@ -151,23 +149,84 @@ serial_match_strings (char *st1, char *st2)
 	return match;
 }
 
+/* Unused */
+uint8_t
+serial_count_arguments (char* input)
+{
+	char *p = input;
+	uint8_t count = 1;
+	uint8_t sp = 0;
+	
+	while (*p != '\0') {
+		if (*p == ' ') {
+			sp = 1;
+		} else {
+			if (sp) {
+				/* The previous char was space and this is not */
+				count++;
+				sp = 0;
+			}
+		}
+		p++;
+	}
+	return count;
+}
+
+/* Note: this is destructive to input, argv is considered an output */
+uint8_t
+serial_split_args (char* input, char* argv[])
+{
+	char *p = input;
+	uint8_t count = 1;
+	uint8_t sp = 0;
+	
+	argv[count-1] = input;
+	while (*p != '\0') {
+		if (*p == ' ') {
+			sp = 1;
+			//replce the space with a null terminator
+			*p = '\0';
+		} else {
+			if (sp) {
+				/* The previous char was space and this is not */
+				count++;
+				argv[count-1] = p;
+				sp = 0;
+			}
+		}
+		p++;
+	}
+	return count;
+}
+
 void
 serial_find_command (void)
 {
 	command_t *current_command;
 	int i = 0;
+	uint8_t argc;
+	//up to 10 arguments
+	char *argv[10];
 
 	current_command = &commands[i];
-
-	printf("checking command %s\n", current_command->command);
 
 	while ((current_command->command) != NULL) {
 		if (serial_match_strings(current_command->command, command_buffer)) {
 #ifdef DEBUG_COMMAND_PARSE
 			printf("Found command %s\n", current_command->command);
 #endif /* DEBUG_COMMAND_PARSE */
+
+			argc = serial_split_args(command_buffer, argv);
+
+#ifdef DEBUG_COMMAND_PARSE
+			for (i = 0; i < argc; i++) {
+				printf("%d: %s\n", i, argv[i]);
+			}
+			printf("Command has %d arguments\n", argc);
+#endif /* DEBUG_COMMAND_PARSE */
+
 			if (current_command->run) {
-				current_command->run(0,0,current_command->ctx);
+				current_command->run(argc, argv, current_command->ctx);
 			}
 			break;
 		}
@@ -182,11 +241,8 @@ serial_process_command (void)
 #ifdef DEBUG_COMMAND_PARSE
 	printf("command was %s\n", command_buffer);
 #endif /* DEBUG_COMMAND_PARSE */
-
 	serial_find_command();
-	
 	command_buffer_pointer = 0;
-
 	command_buffer[0] = '\0';
 }
 

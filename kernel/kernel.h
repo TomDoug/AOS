@@ -1,5 +1,8 @@
+#ifndef _KERNEL_H
+#define _KERNEL_H
+
+#include "configure.h"
 #include "kernel/serial.h"
-#define TOTAL_TASKS 24
 
 #ifndef NULL
 #define NULL 0
@@ -37,3 +40,4 @@ int stop_task (task_t *task_handle);
 
 /* adc.c */
 void adc_startup (void);
+#endif /* _KERNEL_H */

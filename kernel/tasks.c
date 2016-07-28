@@ -1,5 +1,5 @@
 #include <avr/io.h>
-#include "kernel.h"
+#include "kernel\kernel.h"
 
 /* Pool to take our tasks from */
 task_t task_pool[TOTAL_TASKS];
