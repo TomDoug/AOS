@@ -36,15 +36,17 @@ the USART, attaching it to stdin and stdout, and parsing the commands.
 		returns:
 			int - always 0
 
-	void serial_poll (void);
-		Poll the serial module. This should only be called by the kernel.
+```
+void serial_poll (void);
+	Poll the serial module. This should only be called by the kernel.
 
-		inputs:
-			void
-		returns:
-			void
+	inputs:
+		void
+	returns:
+		void
+```
 
-'''
+```
 char kbhit (void);
 	Check to see if a character has beed pressed. (Note: user space input handling will likely 
 	interfere with command processing).
@@ -53,7 +55,7 @@ char kbhit (void);
 		void
 	returns: 
 		char - 1 if an unhandled key has been pressed. 0 otherwise.
-'''
+```
 	
 
 #Feature Roadmap/TODO
