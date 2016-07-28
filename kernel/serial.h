@@ -13,7 +13,7 @@ typedef struct command_s {
 
 int print_help (int argc, char* argv[], void *ctx);
 
-void add_command(char* command, cmd_func run, void* ctx);
+command_t* add_command(char* command, cmd_func run, void* ctx);
 
 
 void USART_putchar (char c, FILE *stream);

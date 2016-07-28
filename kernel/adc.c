@@ -1,4 +1,5 @@
 #include <avr/io.h>
+#include "kernel/kernel.h"
 
 /*
  * This module will be for accessing

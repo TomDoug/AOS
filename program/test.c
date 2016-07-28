@@ -23,9 +23,10 @@ typedef struct {
 
 adc_ctx adc;
 
-void led_on (int argc, char* argv[], void *ctx);
-void led_off (int argc, char* argv[], void *ctx);
-
+int led_on	 (int argc, char* argv[], void *ctx);
+int led_off	 (int argc, char* argv[], void *ctx);
+int read_adc (int argc, char* argv[], void *ctx);
+	
 /***** BLINK TEST ******/
 int blink_startup (void *ctx)
 {
@@ -42,22 +43,25 @@ int blink_startup (void *ctx)
 	//add commands to turn the LED on and off
 	add_command("ledon", led_on, ctx);
 	add_command("ledoff", led_off, ctx);
+	return 0;
 }
 
-void led_on (int argc, char* argv[], void *ctx)
+int led_on (int argc, char* argv[], void *ctx)
 {
 	blink_ctx *blnk = ctx;
 	//turn on led
 	PORTD |= (1 << PD5);
 	blnk->state = 1;
+	return 0;
 }
 
-void led_off (int argc, char* argv[], void *ctx)
+int led_off (int argc, char* argv[], void *ctx)
 {
 	blink_ctx *blnk = ctx;
 	//turn off the LED
 	PORTD &= ~(1 << PD5);
 	blnk->state = 0;
+	return 0;
 }
 
 int blink_run (void *ctx)
@@ -100,6 +104,15 @@ int adc_test_startup (void *ctx) {
 	adc->max = 0;
 	adc->min = 255;
 	adc->counter = 0;
+	add_command("readadc", read_adc, ctx);
+	return 0;
+}
+
+int read_adc (int argc, char* argv[], void *ctx) {
+	adc_ctx *adc = (adc_ctx *) ctx;
+	uint8_t sample = adc_get();
+	printf("%d\n", sample);
+	return 0;
 }
 
 int adc_run (void *ctx) {
@@ -113,18 +126,19 @@ int adc_run (void *ctx) {
 	}
 
 	if (sample < adc->min) {
-		printf("Sample min updated from %d to ", adc->min);
+//		printf("Sample min updated from %d to ", adc->min);
 		adc->min = sample;
-		printf("%d\n", adc->min);
+//		printf("%d\n", adc->min);
 	}
 	if (sample > adc->max) {
-		printf("Sample max updated from %d to ", adc->max);
+//		printf("Sample max updated from %d to ", adc->max);
 		adc->max = sample;
-		printf("%d\n", adc->max);
+//		printf("%d\n", adc->max);
 	}
 
 	//scale
 	adc->blink->duty = (((int)(sample - adc->min)) * 100) / (int)(adc->max - adc->min);
+	return 0;
 }
 
 

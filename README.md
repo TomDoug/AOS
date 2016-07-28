@@ -17,3 +17,9 @@ will be parsed by the kernel.
 - Make help print look nicer
 - Add ability to turn on/off options
 - Add more sample tasks
+- Better define the timer operation
+- Add software timers (callbacks after x ticks)
+- Generalize pin support (set pinstates with function calls, etc.)
+- Add ability to attach to button inturrupts? (this could mesh nicely with the muxed input)
+- Generalize ADC support
+- Add ability to use PWM pins

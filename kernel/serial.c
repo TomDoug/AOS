@@ -42,10 +42,11 @@ add_command(char* command, cmd_func run, void* ctx) {
 #ifdef DEBUG_COMMAND_PARSE
 			printf("Command %s added\n", command);
 #endif /* DEBUG_COMMAND_PARSE */
-			return;
+			return &commands[i];
 		}
 	}
 	printf("Could not add command, all spots full\n");
+	return NULL;
 }
 
 void
